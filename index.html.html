@@ -1,0 +1,224 @@
+
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smatyinak</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #ffd1e5, #fff0f7);
+}
+
+.doboz {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    background: rgba(255,255,255,.85);
+    padding: 40px 30px;
+    border-radius: 25px;
+    box-shadow: 0 8px 35px #ff83b855;
+    width: min(90%, 440px);
+}
+
+h1 {
+    color: #ff3686;
+    font-size: 38px;
+}
+
+.gombok {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+button {
+    border: none;
+    border-radius: 14px;
+    padding: 14px 25px;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#igen {
+    background: #ff438b;
+    color: white;
+}
+
+#nem {
+    background: #eeeeee;
+    color: #333;
+}
+
+.sziv, .merges {
+    position: fixed;
+    pointer-events: none;
+    z-index: 1;
+    user-select: none;
+}
+
+.sziv {
+    top: -50px;
+    animation: hullas linear forwards;
+}
+
+@keyframes hullas {
+    to {
+        transform: translateY(115vh) rotate(360deg);
+        opacity: .2;
+    }
+}
+
+.merges {
+    animation: pattogas 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes pattogas {
+    from { transform: scale(.8) rotate(-10deg); }
+    to { transform: scale(1.2) rotate(10deg); }
+}
+
+body.igen {
+    background: linear-gradient(135deg, #ffacd0, #ffe3ef, #ffc0dc);
+}
+
+body.nem {
+    background: linear-gradient(135deg, #ffc3c3, #ffe1e1);
+}
+
+body.nem h1 {
+    color: #d92323;
+    font-size: 42px;
+}
+
+body.igen h1 {
+    font-size: 50px;
+}
+
+@media (max-width: 400px) {
+    .doboz { padding: 30px 15px; }
+    h1 { font-size: 30px; }
+}
+</style>
+</head>
+
+<body>
+<div class="doboz">
+    <h1 id="kerdes">Szeretsz?</h1>
+    <div class="gombok" id="gombok">
+        <button id="igen">Igen</button>
+        <button id="nem">Nem</button>
+    </div>
+</div>
+
+<script>
+const igen = document.getElementById("igen");
+const nem = document.getElementById("nem");
+const kerdes = document.getElementById("kerdes");
+const gombok = document.getElementById("gombok");
+
+let elugrasok = 0;
+let befejezve = false;
+
+function elugras() {
+    if (befejezve) return;
+
+    // Néha hagyjuk, hogy el lehessen kapni!
+    elugrasok++;
+    if (elugrasok % 4 === 0) return;
+
+    nem.style.position = "fixed";
+
+    const x = Math.random() *
+        Math.max(0, window.innerWidth - nem.offsetWidth - 20);
+    const y = Math.random() *
+        Math.max(0, window.innerHeight - nem.offsetHeight - 20);
+
+    nem.style.left = Math.max(10, x) + "px";
+    nem.style.top = Math.max(10, y) + "px";
+}
+
+nem.addEventListener("mouseenter", elugras);
+
+nem.addEventListener("touchstart", function(e) {
+    if (elugrasok % 4 !== 0) {
+        e.preventDefault();
+        elugras();
+    }
+}, { passive: false });
+
+igen.addEventListener("click", function() {
+    if (befejezve) return;
+    befejezve = true;
+
+    document.body.classList.add("igen");
+    kerdes.textContent = "yipppee ❤️";
+    gombok.remove();
+
+    // Szívecskeeső
+    for (let i = 0; i < 80; i++) {
+        setTimeout(() => {
+            const s = document.createElement("div");
+            s.className = "sziv";
+            s.textContent = ["💗", "💖", "💕", "❤️", "💘"][
+                Math.floor(Math.random() * 5)
+            ];
+            s.style.left = Math.random() * 100 + "vw";
+            s.style.fontSize = (20 + Math.random() * 25) + "px";
+            s.style.animationDuration = (3 + Math.random() * 4) + "s";
+            document.body.appendChild(s);
+            setTimeout(() => s.remove(), 7500);
+        }, i * 70);
+    }
+
+    setInterval(() => {
+        if (!document.body.classList.contains("igen")) return;
+        const s = document.createElement("div");
+        s.className = "sziv";
+        s.textContent = ["❤️", "💗", "💕"][Math.floor(Math.random() * 3)];
+        s.style.left = Math.random() * 100 + "vw";
+        s.style.fontSize = "28px";
+        s.style.animationDuration = "5s";
+        document.body.appendChild(s);
+        setTimeout(() => s.remove(), 5000);
+    }, 350);
+});
+
+nem.addEventListener("click", function() {
+    if (befejezve) return;
+    befejezve = true;
+
+    document.body.classList.add("nem");
+    kerdes.textContent = "Kötsööööööög 😡";
+    gombok.remove();
+    nem.remove();
+
+    // Mérges fejek mindenfelé
+    for (let i = 0; i < 35; i++) {
+        const m = document.createElement("div");
+        m.className = "merges";
+        m.textContent = ["😡", "🤬", "😠", "💢"][
+            Math.floor(Math.random() * 4)
+        ];
+        m.style.left = Math.random() * 95 + "vw";
+        m.style.top = Math.random() * 90 + "vh";
+        m.style.fontSize = (25 + Math.random() * 35) + "px";
+        m.style.animationDelay = Math.random() + "s";
+        document.body.appendChild(m);
+    }
+});
+</script>
+</body>
+</html>
